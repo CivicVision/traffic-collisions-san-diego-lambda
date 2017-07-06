@@ -1,0 +1,26 @@
+service: traffic-collissions-data-pipeline
+
+provider:
+  name: aws
+  runtime: python2.7
+  profile: zoning
+  timeout: 300
+
+package:
+  include:
+    - venv/lib/python2.7/site-packages
+    - load_data.py
+    - ranking.py
+    - analysis.py
+    - upload.py
+  exclude:
+    - venv
+
+functions:
+  traffic_collissions:
+    handler: handler.traffic_collissions
+    events:
+      - schedule:
+        name: traffic-collissions-schedule
+        description: 'Schedule for Traffic Collissions updates'
+        rate: cron(0 2 * * ? *)
