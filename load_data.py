@@ -7,6 +7,9 @@ sys.path.append(env_path)
 import agate
 import agateremote
 
+def load_last_fatality():
+    return agate.Table.from_url('https://s3.amazonaws.com/traffic-sd/last_fatality.csv')
+
 def load_data(data):
     data['table'] = agate.Table.from_url('http://seshat.datasd.org/pd/pd_collisions_datasd.csv')
     return data

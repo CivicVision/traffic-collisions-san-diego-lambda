@@ -24,3 +24,10 @@ functions:
         name: traffic-collissions-schedule
         description: 'Schedule for Traffic Collissions updates'
         rate: cron(0 2 * * ? *)
+  tweet_collissions:
+    handler: handler.tweet_fatality
+    events:
+      - schedule:
+        name: traffic-collissions-fatality-schedule
+        description: 'Schedule for Traffic Collissions updates'
+        rate: cron(0 6 * * ? *)

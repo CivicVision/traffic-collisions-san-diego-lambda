@@ -5,6 +5,10 @@ env_path = os.path.join(here, "./venv/lib/python2.7/site-packages/")
 sys.path.append(env_path)
 
 import boto3
+import random
+import string
+
+rand_str = lambda n: ''.join([random.choice(string.lowercase) for i in xrange(n)])
 
 def upload_file_to_s3(bucket_file, local_file):
     session = boto3.session.Session()
@@ -14,6 +18,11 @@ def upload_file_to_s3(bucket_file, local_file):
 def upload_file(data, data_key, filename):
     tmp_filename = '/tmp/{}.csv'.format(data_key)
     data[data_key].to_csv(tmp_filename)
+    upload_file_to_s3(filename,tmp_filename)
+
+def upload_table(table, filename):
+    tmp_filename = '/tmp/{}.csv'.format(rand_str(5))
+    table.to_csv(tmp_filename)
     upload_file_to_s3(filename,tmp_filename)
 
 def killed_injured_year(data):
