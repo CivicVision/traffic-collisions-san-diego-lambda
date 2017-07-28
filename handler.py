@@ -10,6 +10,26 @@ import load_data
 import upload
 import tweet
 
+def geocode_collissions(event, context):
+    data = {}
+    data['table'] = load_data.load_2017_killed_data()
+
+    data['data_2017'] = load_data.geocode(data['table'])
+
+    upload.upload_file(data, 'data_2017', 'accidents_killed_2017_geocoded.csv')
+
+    body = {
+        "message": "Go Serverless v1.0! Your function executed successfully!",
+        "input": event
+    }
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(body)
+    }
+
+    return response
+
 def traffic_collissions(event, context):
     data = {}
     data = load_data.load_data(data)

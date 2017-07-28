@@ -25,6 +25,13 @@ functions:
         name: traffic-collissions-schedule
         description: 'Schedule for Traffic Collissions updates'
         rate: cron(0 2 * * ? *)
+  geocode_collissions:
+    handler: handler.geocode_collissions
+    events:
+      - schedule:
+        name: traffic-collissions-geocode-schedule
+        description: 'Schedule for Traffic Collissions updates'
+        rate: cron(30 2 * * ? *)
   tweet_collissions:
     handler: handler.tweet_fatality
     events:
