@@ -13,6 +13,7 @@ package:
     - ranking.py
     - analysis.py
     - upload.py
+    - filters.py
   exclude:
     - venv
 
