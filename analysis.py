@@ -6,6 +6,7 @@ sys.path.append(env_path)
 
 import agate
 from ranking import GroupRanking, RankWeightedAccidents
+count_accidents_injured = agate.Summary('injured', agate.Number(), lambda r: sum(injured > 0 for injured in r.values()))
 
 def sum_counts_by_full_hour(data):
     data['full_hour']= data['table'].group_by('date_hour').aggregate([
@@ -19,7 +20,8 @@ def sum_counts_by_hour(data):
     data['hour']= data['table'].group_by('hour').aggregate([
         ('killed', agate.Sum('killed')),
         ('injured', agate.Sum('injured')),
-        ('accidents', agate.Count())
+        ('accidents', agate.Count()),
+        ('accidents_injured', count_accidents_injured)
     ]).compute([
         ('killed_percent', agate.Percent('killed')),
         ('injured_percent', agate.Percent('injured')),
@@ -45,6 +47,7 @@ def year_sum_counts(data):
         ('killed', agate.Sum('killed')),
         ('injured', agate.Sum('injured')),
         ('accidents', agate.Count()),
+        ('accidents_injured', count_accidents_injured)
     ])
     return data
 
