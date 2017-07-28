@@ -13,6 +13,7 @@ package:
     - ranking.py
     - analysis.py
     - upload.py
+    - filters.py
   exclude:
     - venv
 
@@ -31,3 +32,10 @@ functions:
         name: traffic-collissions-geocode-schedule
         description: 'Schedule for Traffic Collissions updates'
         rate: cron(30 2 * * ? *)
+  tweet_collissions:
+    handler: handler.tweet_fatality
+    events:
+      - schedule:
+        name: traffic-collissions-fatality-schedule
+        description: 'Schedule for Traffic Collissions updates'
+        rate: cron(0 6 * * ? *)

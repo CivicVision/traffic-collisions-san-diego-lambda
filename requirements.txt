@@ -3,3 +3,4 @@ agate-remote
 proof
 boto3
 googlemaps
+tweepy
