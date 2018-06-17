@@ -7,24 +7,35 @@ sys.path.append(env_path)
 import agate
 import agateremote
 import googlemaps
+import datetime
 
 gmaps = googlemaps.Client(key='AIzaSyASamO-yIbsV9Ml6ySteFK12XD2xbleTHU')
 
-def load_2017_killed_data():
+def load_year_killed_data(year):
     specified_types = {
         'killed': agate.Number(),
         'injured': agate.Number(),
         'date_hour': agate.Text()
     }
-    return agate.Table.from_url('https://s3.amazonaws.com/traffic-sd/accidents_killed_2017.csv', column_types=specified_types)
+    return agate.Table.from_url('https://s3.amazonaws.com/traffic-sd/accidents_killed_{}.csv'.format(year), column_types=specified_types)
 
 
 def load_last_fatality():
     return agate.Table.from_url('https://s3.amazonaws.com/traffic-sd/last_fatality.csv')
 
+def load_last_collision():
+    return agate.Table.from_url('https://s3.amazonaws.com/traffic-sd/last_collision.csv')
+
 def load_data(data):
     data['table'] = agate.Table.from_url('http://seshat.datasd.org/pd/pd_collisions_datasd.csv')
     return data
+
+def load_all_data_by_year(year):
+    data = {}
+    data = load_data(data)
+    data = add_year_column(data)
+    return data['table'].where(lambda r: r['year'] == str(year))
+
 
 def load_police_beats(data):
     data['police_beats'] = agate.Table.from_url("http://seshat.datasd.org/pd/pd_beat_neighborhoods_datasd.csv")
@@ -63,6 +74,40 @@ def gmaps_geocode(d):
     if len(result) > 0:
         return "{} {}".format(result[0]["geometry"]["location"]["lat"], result[0]["geometry"]["location"]["lng"])
     return ""
+
+def get_last_report_id(data):
+    last = data.order_by('date_time', reverse=True).limit(1)
+    return last.rows[0].get('report_id')
+
+def get_new_last_collision_report_id():
+    table = load_all_data_by_year(datetime.date.today().year)
+    return get_last_report_id(table)
+
+def get_last_collision_report_id():
+    last = load_last_collision()
+    if len(last.rows) > 0:
+        return get_last_report_id(last)
+
+def get_new_last_fatality_report_id():
+    last_year = datetime.date.today().year
+    table = load_year_killed_data(last_year)
+    return get_last_report_id(table)
+
+def get_last_fatality_report_id():
+    last = load_last_fatality()
+    return get_last_report_id(last)
+
+def last_report_values(data):
+    last = data.order_by('date_time', reverse=True).limit(1)
+    return last.rows.values()[0]
+
+def get_last_killed_report_values():
+    table = load_year_killed_data(datetime.date.today().year)
+    return last_report_values(table)
+
+def get_last_report_values():
+    table = load_all_data_by_year(datetime.date.today().year)
+    return last_report_values(table)
 
 def geocode(table):
     return table.compute([
