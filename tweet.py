@@ -24,11 +24,9 @@ def tweet_last_collision():
     return result
 
 def tweet_status(message):
-    return print(message)
     auth = tweepy.OAuthHandler(os.environ['consumer_token'], os.environ['consumer_secret'])
     auth.set_access_token(os.environ['access_token'], os.environ['access_secret'])
     api = tweepy.API(auth)
-    print(api.update_status(message))
 
 def tweet_collision(row):
     if row.get('fatality') and row.get('fatality') > 0:
@@ -53,4 +51,3 @@ def tweet_fatality(row):
     status = 'New traffic fatality has been reported on {}. The dashboard has been updated: https://civicvision.de/vision-zero-dashboard '.format(date)
     return tweet_status(status)
 
-tweet_last_collision()
