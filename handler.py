@@ -16,7 +16,10 @@ def geocode_collissions_by_year(event, context):
     data['table'] = get_data_for_year(year)
     event_filter_name = ''
     if event['filter']:
-        data['table'] = analysis.filter_table_func(data['table'], filters.killed)
+        if event['filter'] == 'killed':
+            data['table'] = analysis.filter_table_func(data['table'], filters.killed)
+        if event['filter'] == 'injured':
+            data['table'] = analysis.filter_table_func(data['table'], filters.injured)
         event_filter_name = '{}_'.format(event['filter'])
 
     data['data'] = load_data.geocode(data['table'])
