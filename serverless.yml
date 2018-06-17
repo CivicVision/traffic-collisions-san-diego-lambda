@@ -25,6 +25,8 @@ functions:
         name: traffic-collissions-schedule
         description: 'Schedule for Traffic Collissions updates'
         rate: cron(0 2 * * ? *)
+  geocode_c_by_year:
+    handler: handler.geocode_collissions_by_year
   geocode_collissions:
     handler: handler.geocode_collissions
     events:
