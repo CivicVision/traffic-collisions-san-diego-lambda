@@ -1,9 +1,3 @@
-import sys, os, json
-
-here = os.path.dirname(os.path.realpath(__file__))
-env_path = os.path.join(here, "./venv/lib/python2.7/site-packages/")
-sys.path.append(env_path)
-
 import tweepy
 import agate
 import load_data
