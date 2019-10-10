@@ -1,9 +1,3 @@
-import sys, os, json
-
-here = os.path.dirname(os.path.realpath(__file__))
-env_path = os.path.join(here, "./venv/lib/python2.7/site-packages/")
-sys.path.append(env_path)
-
 import analysis
 import filters
 import load_data
@@ -42,7 +36,7 @@ def geocode_collissions_by_year(event, context):
 def geocode_collissions(event, context):
     data = {}
     year = datetime.date.today().year
-    data['table'] = load_data.load_year_killed_data(year)
+    data['table'] = load_data.load_year_killed_data(str(year))
 
     data['data_current_year'] = load_data.geocode(data['table'])
 
@@ -81,17 +75,18 @@ def traffic_collissions(event, context):
     for year in range(current_year, 2016, -1):
         killed_year = 'killed_{}'.format(year)
 
-        data[year] = analysis.data_for_year(data['table'], year)
+        data[year] = analysis.data_for_year(data['table'], str(year))
         data[killed_year] = analysis.filter_table_func(data[year], filters.killed)
 
         upload.upload_file(data, killed_year, 'accidents_killed_{}.csv'.format(year))
         upload.upload_file(data, year, 'accidents_{}.csv'.format(year))
 
-    charge_2017 = analysis.sum_counts_group(data['2017'], 'charge_desc')
+    '''
+    charge_2017 = analysis.sum_counts_group(data[2017], 'charge_desc')
     charge_year = analysis.sum_counts_group(data['table'].group_by('year'), 'charge_desc')
     charge = analysis.sum_counts_group(data['table'], 'charge_desc')
 
-    street_name_2017 = analysis.sum_counts_group(data['2017'],'street_name')
+    street_name_2017 = analysis.sum_counts_group(data[2017],'street_name')
     street_name_year = analysis.sum_counts_group(data['table'].group_by('year'),'street_name')
     street_name = analysis.sum_counts_group(data['table'],'street_name')
 
@@ -112,6 +107,7 @@ def traffic_collissions(event, context):
     upload.upload_table(street_name_year, 'year_street_name.csv')
     upload.upload_table(street_name_2017, 'street_name_2017.csv')
     upload.upload_table(street_name, 'street_name.csv')
+    '''
 
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
