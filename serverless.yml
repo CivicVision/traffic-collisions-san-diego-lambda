@@ -2,28 +2,20 @@ service: traffic-collissions-data-pipeline
 
 provider:
   name: aws
-  runtime: python2.7
+  runtime: python3.7
   profile: zoning
   timeout: 300
+  environment:
+    GOOGLE_MAPS_KEY: ""
 
 plugins:
   - serverless-python-requirements
 custom:
   pythonRequirements:
-    slim: true
-
-package:
-  include:
-    - load_data.py
-    - handler.py
-    - ranking.py
-    - analysis.py
-    - upload.py
-    - filters.py
-  exclude:
-    - venv
-    - node_modules
-    - pipe
+    zip: true
+    dockerizePip: non-linux
+    useDownloadCache: true
+    useStaticCache: false
 
 functions:
   traffic_collissions:

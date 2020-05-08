@@ -2,8 +2,12 @@ import agate
 import agateremote
 import googlemaps
 import datetime
+import os
 
-gmaps = googlemaps.Client(key='AIzaSyASamO-yIbsV9Ml6ySteFK12XD2xbleTHU')
+import metadata
+
+gmaps = googlemaps.Client(key=os.environ['GOOGLE_MAPS_KEY'])
+traffic_source = 'http://seshat.datasd.org/pd/pd_collisions_datasd_v1.csv'
 
 def load_year_killed_data(year):
     specified_types = {
@@ -21,7 +25,7 @@ def load_last_collision():
     return agate.Table.from_url('https://s3.amazonaws.com/traffic-sd/last_collision.csv')
 
 def load_data(data):
-    data['table'] = agate.Table.from_url('http://seshat.datasd.org/pd/pd_collisions_datasd.csv')
+    data['table'] = agate.Table.from_url(traffic_source)
     return data
 
 def load_all_data_by_year(year):
@@ -54,14 +58,14 @@ def add_full_hour_date(data):
     return data
 
 def format_address(d):
-    street_address = "{} {}".format(d["street_name"], d["street_type"])
-    if d["cross_st_name"]:
-        return "{} and {} {}".format(street_address, d["cross_st_name"], d["cross_st_type"])
+    street_address = "{} {}".format(d[metadata.STREET_NAME], d[metadata.STREET_TYPE])
+    if d[metadata.CROSS_STREET]:
+        return "{} and {} {}".format(street_address, d[metadata.CROSS_STREET], d[metadata.CROSS_TYPE])
     else:
-        if d["street_dir"]:
-            return "{} {} {}".format(d["street_no"], d["street_dir"], street_address)
+        if d[metadata.STREET_DIR]:
+            return "{} {} {}".format(d[metadata.STREET_NO], d[metadata.STREET_DIR], street_address)
         else:
-            return "{} {}".format(d["street_no"], street_address)
+            return "{} {}".format(d[metadata.STREET_NO], street_address)
 
 def gmaps_geocode(d):
     result = gmaps.geocode("{}, San Diego, CA, USA".format(format_address(d)))

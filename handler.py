@@ -1,9 +1,15 @@
+try:
+  import unzip_requirements
+except ImportError:
+  pass
+
+import load_data
 import analysis
 import filters
-import load_data
 import upload
 import tweet
 import datetime
+import json
 
 def geocode_collissions_by_year(event, context):
     year = event['year']
@@ -81,6 +87,16 @@ def traffic_collissions(event, context):
         upload.upload_file(data, killed_year, 'accidents_killed_{}.csv'.format(year))
         upload.upload_file(data, year, 'accidents_{}.csv'.format(year))
 
+    groupped_data = analysis.year_sum_counts(year_data)
+    year_police_beat_data = analysis.year_police_beat_sum_counts(year_data)
+    full_hour_data = analysis.sum_counts_by_full_hour(hour_data)
+    overall_hour_data_analysis = analysis.sum_counts_by_hour(overall_hour_data)
+
+    upload.killed_injured_year_police_beat(year_police_beat_data)
+    upload.accidents(year_data)
+    upload.killed_injured_year(groupped_data)
+    upload.full_hour(full_hour_data)
+    upload.hour_data(overall_hour_data_analysis)
     '''
     charge_2017 = analysis.sum_counts_group(data[2017], 'charge_desc')
     charge_year = analysis.sum_counts_group(data['table'].group_by('year'), 'charge_desc')
