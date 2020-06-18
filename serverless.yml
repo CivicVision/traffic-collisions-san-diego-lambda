@@ -6,16 +6,24 @@ provider:
   profile: zoning
   timeout: 300
 
+plugins:
+  - serverless-python-requirements
+custom:
+  pythonRequirements:
+    slim: true
+
 package:
   include:
-    - venv/lib/python2.7/site-packages
     - load_data.py
+    - handler.py
     - ranking.py
     - analysis.py
     - upload.py
     - filters.py
   exclude:
     - venv
+    - node_modules
+    - pipe
 
 functions:
   traffic_collissions:

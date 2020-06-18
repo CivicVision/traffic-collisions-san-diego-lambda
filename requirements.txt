@@ -1,6 +1,4 @@
 agate
 agate-remote
-proof
-boto3
-googlemaps
+googlemaps==2.5.1
 tweepy

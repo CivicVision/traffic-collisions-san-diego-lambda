@@ -1,14 +1,9 @@
-import sys, os, json
-
-here = os.path.dirname(os.path.realpath(__file__))
-env_path = os.path.join(here, "./venv/lib/python2.7/site-packages/")
-sys.path.append(env_path)
-
 import analysis
 import filters
 import load_data
 import upload
 import tweet
+import datetime
 
 def geocode_collissions_by_year(event, context):
     year = event['year']
@@ -40,11 +35,13 @@ def geocode_collissions_by_year(event, context):
 
 def geocode_collissions(event, context):
     data = {}
-    data['table'] = load_data.load_year_killed_data('2018')
+    year = datetime.date.today().year
+    data['table'] = load_data.load_year_killed_data(str(year))
 
-    data['data_2018'] = load_data.geocode(data['table'])
+    data['data_current_year'] = load_data.geocode(data['table'])
 
-    upload.upload_file(data, 'data_2018', 'accidents_killed_2018_geocoded.csv')
+    current_year_file = 'accidents_killed_{}_geocoded.csv'.format(year)
+    upload.upload_file(data, 'data_current_year', current_year_file)
 
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
@@ -74,16 +71,22 @@ def traffic_collissions(event, context):
     hour_data = load_data.add_full_hour_date(data)
     overall_hour_data = load_data.add_hour_column(data)
 
-    data['2017'] = analysis.data_for_year(data['table'], '2017')
-    data['2018'] = analysis.data_for_year(data['table'], '2018')
-    data['killed_2017'] = analysis.filter_table_func(data['2017'], filters.killed)
-    data['killed_2018'] = analysis.filter_table_func(data['2018'], filters.killed)
+    current_year = datetime.date.today().year
+    for year in range(current_year, 2016, -1):
+        killed_year = 'killed_{}'.format(year)
 
-    charge_2017 = analysis.sum_counts_group(data['2017'], 'charge_desc')
+        data[year] = analysis.data_for_year(data['table'], str(year))
+        data[killed_year] = analysis.filter_table_func(data[year], filters.killed)
+
+        upload.upload_file(data, killed_year, 'accidents_killed_{}.csv'.format(year))
+        upload.upload_file(data, year, 'accidents_{}.csv'.format(year))
+
+    '''
+    charge_2017 = analysis.sum_counts_group(data[2017], 'charge_desc')
     charge_year = analysis.sum_counts_group(data['table'].group_by('year'), 'charge_desc')
     charge = analysis.sum_counts_group(data['table'], 'charge_desc')
 
-    street_name_2017 = analysis.sum_counts_group(data['2017'],'street_name')
+    street_name_2017 = analysis.sum_counts_group(data[2017],'street_name')
     street_name_year = analysis.sum_counts_group(data['table'].group_by('year'),'street_name')
     street_name = analysis.sum_counts_group(data['table'],'street_name')
 
@@ -98,18 +101,13 @@ def traffic_collissions(event, context):
     upload.full_hour(full_hour_data)
     upload.hour_data(overall_hour_data_analysis)
 
-    upload.upload_file(data, 'killed_2017', 'accidents_killed_2017.csv')
-    upload.upload_file(data, '2017', 'accidents_2017.csv')
-
-    upload.upload_file(data, 'killed_2018', 'accidents_killed_2018.csv')
-    upload.upload_file(data, '2018', 'accidents_2018.csv')
-
     upload.upload_table(charge_year, 'year_charge_desc.csv')
     upload.upload_table(charge_2017, 'charge_desc_2017.csv')
     upload.upload_table(charge, 'charge_desc.csv')
     upload.upload_table(street_name_year, 'year_street_name.csv')
     upload.upload_table(street_name_2017, 'street_name_2017.csv')
     upload.upload_table(street_name, 'street_name.csv')
+    '''
 
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
