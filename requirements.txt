@@ -1,4 +1,4 @@
 agate
 agate-remote
-googlemaps==2.5.1
+googlemaps==4.4.7
 tweepy
